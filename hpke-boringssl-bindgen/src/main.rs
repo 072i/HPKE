@@ -70,9 +70,9 @@ impl<'a> Visit<'a> for VB {
         let orig_name = i.sig.ident.clone();
         let slice_params = orig_params.windows(2).filter_map(filter_slice);
         let slice_mut_params = orig_params.windows(3).filter_map(filter_slice_mut);
-        let all_params: Vec<_> = slice_params.chain(slice_mut_params).collect();
-        let new_params = get_new_params(&orig_params, &all_params);
-        let (callee_args, let_stmts, set_stmts) = get_callee_args(&orig_params, &all_params);
+        let param_patterns: Vec<_> = slice_params.chain(slice_mut_params).collect();
+        let (new_params, callee_args, let_stmts, set_stmts) =
+            make_args(orig_params, param_patterns);
         let new_name = get_new_name(&orig_name);
         let new_output = i.sig.output.clone();
         let tokens = quote::quote! {
@@ -89,125 +89,124 @@ impl<'a> Visit<'a> for VB {
     }
 }
 fn get_new_name(orig_name: &Ident) -> Ident {
-    str2ast(&format!("rust_{}", orig_name).to_snake_case())
+    format!("rust_{}", orig_name).to_snake_case().to_ast()
 }
-fn get_callee_args(
-    orig_params: &[&FnArg],
-    all_params: &[Vec<&FnArg>],
-) -> (Punctuated<Expr, Comma>, Vec<Stmt>, Vec<Stmt>) {
-    let mut out = Punctuated::new();
+fn make_args(
+    orig_params: Vec<&FnArg>,
+    param_patterns: Vec<Vec<&FnArg>>,
+) -> (
+    Punctuated<FnArg, Comma>,
+    Punctuated<Expr, Comma>,
+    Vec<Stmt>,
+    Vec<Stmt>,
+) {
     let mut counter = 0;
-    let mut let_stmts = Vec::new();
-    let mut set_stmts = Vec::new();
-    orig_params.iter().copied().for_each(|param| {
-        match all_params.iter().find(|params| params.contains(&param)) {
-            Some(params) => {
-                let param0 = arg2str(params[0]);
-                out.push(match params.len() {
-                    2 if params[0] == param => str2ast(&format!("{}.as_ptr()", param0)),
-                    2 if params[1] == param => str2ast(&format!("{}.len()", param0)),
-                    3 if params[0] == param => str2ast(&format!("{}.as_mut_ptr()", param0)),
-                    3 if params[1] == param => {
-                        counter += 1;
-                        let_stmts.push(str2ast(&format!("let mut __len{} = 0;", counter)));
-                        set_stmts.push(str2ast(&format!("{}.set_len(__len{});", param0, counter)));
-                        str2ast(&format!("&mut __len{}", counter))
-                    }
-                    3 if params[2] == param => str2ast(&format!("{}.capacity()", param0)),
-                    _ => panic!(),
-                })
-            }
-            None => out.push(str2ast(&arg2str(param))),
-        }
-    });
-    (out, let_stmts, set_stmts)
-}
-fn get_new_params(orig_params: &[&FnArg], all_params: &[Vec<&FnArg>]) -> Punctuated<FnArg, Comma> {
-    let mut out = Punctuated::new();
-    orig_params.iter().copied().for_each(|param| {
-        match all_params.iter().find(|params| params.contains(&param)) {
-            Some(params) if params[0] == param => {
-                let mut new_param = params[0].clone();
-                match (params.len(), &mut new_param) {
-                    (2, FnArg::Typed(pat)) => {
-                        pat.ty = Box::new(str2ast("&impl crate::FfiSlice"));
-                    }
-                    (3, FnArg::Typed(pat)) => {
-                        pat.ty = Box::new(str2ast("&mut impl crate::FfiSliceMut"));
-                    }
-                    _ => panic!(),
+    orig_params.into_iter().fold(
+        (Punctuated::new(), Punctuated::new(), Vec::new(), Vec::new()),
+        |(mut arg_list, mut expr_list, mut let_list, mut set_list), orig_param| {
+            match param_patterns.iter().find_map(|pattern| {
+                pattern
+                    .iter()
+                    .position(|&param| param == orig_param)
+                    .map(|pos| (pos, pattern.len(), pattern[0]))
+            }) {
+                Some((0, 2, p0)) => {
+                    let mut new_param = p0.clone();
+                    new_param.set_ty("&impl crate::FfiSlice".to_ast());
+                    arg_list.push(new_param);
+
+                    expr_list.push(format!("{}.as_ptr()", p0.ident()).to_ast());
                 }
-                out.push(new_param);
+                Some((1, 2, p0)) => expr_list.push(format!("{}.len()", p0.ident()).to_ast()),
+                Some((0, 3, p0)) => {
+                    let mut new_param = p0.clone();
+                    new_param.set_ty("&mut impl crate::FfiSliceMut".to_ast());
+                    arg_list.push(new_param);
+
+                    expr_list.push(format!("{}.as_mut_ptr()", p0.ident()).to_ast());
+                }
+                Some((1, 3, p0)) => {
+                    counter += 1;
+                    let_list.push(format!("let mut __len{} = 0;", counter).to_ast());
+                    expr_list.push(format!("&mut __len{}", counter).to_ast());
+                    set_list.push(format!("{}.set_len(__len{});", p0.ident(), counter).to_ast());
+                }
+                Some((2, 3, p0)) => expr_list.push(format!("{}.capacity()", p0.ident()).to_ast()),
+                None => {
+                    arg_list.push(orig_param.clone());
+                    expr_list.push(orig_param.ident().to_string().to_ast());
+                }
+                _ => panic!(),
             }
-            None => out.push(param.clone()),
-            _ => (),
-        }
-    });
-    out
+            (arg_list, expr_list, let_list, set_list)
+        },
+    )
 }
 fn filter_slice<'a>(params: &[&'a FnArg]) -> Option<Vec<&'a FnArg>> {
-    let [FnArg::Typed(a), FnArg::Typed(b)] = params else {
-        return None;
-    };
-    let (Pat::Ident(ia), Pat::Ident(ib)) = (a.pat.as_ref(), b.pat.as_ref()) else {
-        return None;
-    };
-    let (Type::Ptr(pa), Type::Path(pb)) = (a.ty.as_ref(), b.ty.as_ref()) else {
-        return None;
-    };
-    let (Type::Path(pa), Some(_)) = (pa.elem.as_ref(), pa.const_token) else {
-        return None;
-    };
-    let (na, nb) = (ia.ident.to_string(), ib.ident.to_string());
-    if [na.trim_end_matches("_"), "_len"].concat() == nb
-        && pa.path.is_ident("u8")
-        && pb.path.is_ident("usize")
+    let [p1, p2] = params else { return None };
+    if p2.name().ends_with("_len")
+        && *p1.ty() == "*const u8".to_ast()
+        && *p2.ty() == "usize".to_ast()
     {
-        return Some(Vec::from(params));
+        Some(Vec::from(params))
+    } else {
+        None
     }
-    None
 }
 fn filter_slice_mut<'a>(params: &[&'a FnArg]) -> Option<Vec<&'a FnArg>> {
-    let [FnArg::Typed(a), FnArg::Typed(b), FnArg::Typed(c)] = params else {
-        return None;
-    };
-    let (Pat::Ident(_), Pat::Ident(ib), Pat::Ident(ic)) =
-        (a.pat.as_ref(), b.pat.as_ref(), c.pat.as_ref())
-    else {
-        return None;
-    };
-    let (Type::Ptr(pa), Type::Ptr(pb), Type::Path(pc)) =
-        (a.ty.as_ref(), b.ty.as_ref(), c.ty.as_ref())
-    else {
-        return None;
-    };
-    let (Type::Path(pa), Type::Path(pb), Some(_), Some(_)) = (
-        pa.elem.as_ref(),
-        pb.elem.as_ref(),
-        pa.mutability,
-        pb.mutability,
-    ) else {
-        return None;
-    };
-    let (nb, nc) = (ib.ident.to_string(), ic.ident.to_string());
-    if nb.contains("len")
-        && nc.contains("max")
-        && pa.path.is_ident("u8")
-        && pb.path.is_ident("usize")
-        && pc.path.is_ident("usize")
+    let [p1, p2, p3] = params else { return None };
+    if p2.name().ends_with("_len")
+        && p3.name().starts_with("max_")
+        && *p1.ty() == "*mut u8".to_ast()
+        && *p2.ty() == "*mut usize".to_ast()
+        && *p3.ty() == "usize".to_ast()
     {
-        return Some(Vec::from(params));
+        Some(Vec::from(params))
+    } else {
+        None
     }
-    None
 }
-fn str2ast<T: Parse>(s: &str) -> T {
-    syn::parse_str(s).unwrap()
+trait StrExt {
+    fn to_ast<T: Parse>(&self) -> T;
 }
-fn arg2str(arg: &FnArg) -> String {
-    if let FnArg::Typed(p) = arg {
-        if let Pat::Ident(i) = p.pat.as_ref() {
-            return i.ident.to_string();
+impl StrExt for str {
+    fn to_ast<T: Parse>(&self) -> T {
+        syn::parse_str(self).unwrap()
+    }
+}
+trait FnArgExt {
+    fn ident(&self) -> &Ident;
+    fn ty(&self) -> &Type;
+    fn set_ty(&mut self, ty: Type);
+    fn name(&self) -> String;
+}
+impl FnArgExt for FnArg {
+    fn ident(&self) -> &Ident {
+        if let FnArg::Typed(v) = self {
+            if let Pat::Ident(v) = &*v.pat {
+                &v.ident
+            } else {
+                panic!()
+            }
+        } else {
+            panic!()
         }
     }
-    panic!()
+    fn ty(&self) -> &Type {
+        if let FnArg::Typed(v) = self {
+            &v.ty
+        } else {
+            panic!()
+        }
+    }
+    fn set_ty(&mut self, ty: Type) {
+        if let FnArg::Typed(v) = self {
+            *v.ty = ty
+        } else {
+            panic!()
+        }
+    }
+    fn name(&self) -> String {
+        self.ident().to_string()
+    }
 }
