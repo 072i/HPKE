@@ -1,5 +1,6 @@
 use proc_macro2::Ident;
-use quote::{format_ident, quote};
+use quote::format_ident;
+use std::time::{SystemTime, UNIX_EPOCH};
 use syn::punctuated::Punctuated;
 use syn::token::Comma;
 use syn::visit::Visit;
@@ -7,6 +8,11 @@ use syn::visit_mut::VisitMut;
 use syn::{parse_quote, Expr, File, FnArg, ForeignItemFn, Pat, Stmt, Type, Visibility};
 
 fn main() {
+    let ts = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_nanos();
+
     let mut buffer = Vec::new();
     bindgen::builder()
         .clang_arg("-Iboringssl/include")
@@ -19,40 +25,40 @@ fn main() {
         .unwrap()
         .write(Box::new(&mut buffer))
         .unwrap();
+
     let mut file = syn::parse_file(std::str::from_utf8(&buffer).unwrap()).unwrap();
     VA.visit_file_mut(&mut file);
     let mut vb = VB { files: Vec::new() };
     vb.visit_file(&file);
+
     let mut items = Vec::new();
+    items.push(parse_quote! {
+        #[allow(unused)]
+        const CREATED_AT: u128 = #ts;
+    });
     items.extend(file.items);
     vb.files
         .into_iter()
         .for_each(|file| items.extend(file.items));
+
     let file = File {
+        shebang: None,
+        attrs: parse_quote!(
+            #![allow(non_snake_case)]
+            #![allow(non_camel_case_types)]
+            #![allow(clippy::all)]
+        ),
         items,
-        ..syn::parse_file("#![allow(clippy::all)]\n#![allow(non_camel_case_types)]\n").unwrap()
     };
+
     #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
     let path = "hpke-boringssl/src/bindings_macos_aarch64.rs";
     #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
     let path = "hpke-boringssl/src/bindings_linux_x86_64.rs";
     #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
     let path = "hpke-boringssl/src/bindings_windows_x86_64.rs";
-    std::fs::write(
-        path,
-        [
-            format!(
-                "/* {} */\n",
-                std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .unwrap()
-                    .as_secs_f64()
-            ),
-            prettyplease::unparse(&file),
-        ]
-        .concat(),
-    )
-    .unwrap();
+
+    std::fs::write(path, prettyplease::unparse(&file)).unwrap();
 }
 struct VA;
 impl VisitMut for VA {
@@ -76,19 +82,19 @@ impl<'a> Visit<'a> for VB {
             make_args(orig_params, param_patterns);
         let new_name = format_ident!("rust_{}", orig_name);
         let new_output = i.sig.output.clone();
-        let tokens = quote! {
-            pub unsafe fn #new_name (#new_params) #new_output {
+        self.files.push(parse_quote! {
+            pub unsafe fn #new_name(#new_params)#new_output {
                 unsafe {
                     #(#let_stmts)*
-                    let __out = #orig_name (#callee_args);
+                    let __out = #orig_name(#callee_args);
                     #(#set_stmts)*
                     __out
                 }
             }
-        };
-        self.files.push(syn::parse2(tokens).unwrap());
+        });
     }
 }
+#[allow(clippy::type_complexity)]
 fn make_args(
     orig_params: Vec<&FnArg>,
     param_patterns: Vec<Vec<&FnArg>>,
