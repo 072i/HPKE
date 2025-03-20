@@ -1,6 +1,8 @@
-/* 1742476012.081319 */
-#![allow(clippy::all)]
+#![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
+#![allow(clippy::all)]
+#[allow(unused)]
+const CREATED_AT: u128 = 1742477608866984000u128;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct env_md_st {
