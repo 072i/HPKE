@@ -1,4 +1,4 @@
-/* 1742386955.7564142 */
+/* 1742476013.8231227 */
 #![allow(clippy::all)]
 #![allow(non_camel_case_types)]
 #[repr(C)]
@@ -299,115 +299,115 @@ unsafe extern "C" {
     fn EVP_HPKE_CTX_aead(ctx: *const EVP_HPKE_CTX) -> *const EVP_HPKE_AEAD;
     fn EVP_HPKE_CTX_kdf(ctx: *const EVP_HPKE_CTX) -> *const EVP_HPKE_KDF;
 }
-pub unsafe fn rust_evp_hpke_x25519_hkdf_sha256() -> *const EVP_HPKE_KEM {
+pub unsafe fn rust_EVP_hpke_x25519_hkdf_sha256() -> *const EVP_HPKE_KEM {
     unsafe {
         let __out = EVP_hpke_x25519_hkdf_sha256();
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_p256_hkdf_sha256() -> *const EVP_HPKE_KEM {
+pub unsafe fn rust_EVP_hpke_p256_hkdf_sha256() -> *const EVP_HPKE_KEM {
     unsafe {
         let __out = EVP_hpke_p256_hkdf_sha256();
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_kem_id(kem: *const EVP_HPKE_KEM) -> u16 {
+pub unsafe fn rust_EVP_HPKE_KEM_id(kem: *const EVP_HPKE_KEM) -> u16 {
     unsafe {
         let __out = EVP_HPKE_KEM_id(kem);
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_kem_public_key_len(kem: *const EVP_HPKE_KEM) -> usize {
+pub unsafe fn rust_EVP_HPKE_KEM_public_key_len(kem: *const EVP_HPKE_KEM) -> usize {
     unsafe {
         let __out = EVP_HPKE_KEM_public_key_len(kem);
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_kem_private_key_len(kem: *const EVP_HPKE_KEM) -> usize {
+pub unsafe fn rust_EVP_HPKE_KEM_private_key_len(kem: *const EVP_HPKE_KEM) -> usize {
     unsafe {
         let __out = EVP_HPKE_KEM_private_key_len(kem);
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_kem_enc_len(kem: *const EVP_HPKE_KEM) -> usize {
+pub unsafe fn rust_EVP_HPKE_KEM_enc_len(kem: *const EVP_HPKE_KEM) -> usize {
     unsafe {
         let __out = EVP_HPKE_KEM_enc_len(kem);
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_hkdf_sha256() -> *const EVP_HPKE_KDF {
+pub unsafe fn rust_EVP_hpke_hkdf_sha256() -> *const EVP_HPKE_KDF {
     unsafe {
         let __out = EVP_hpke_hkdf_sha256();
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_kdf_id(kdf: *const EVP_HPKE_KDF) -> u16 {
+pub unsafe fn rust_EVP_HPKE_KDF_id(kdf: *const EVP_HPKE_KDF) -> u16 {
     unsafe {
         let __out = EVP_HPKE_KDF_id(kdf);
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_kdf_hkdf_md(kdf: *const EVP_HPKE_KDF) -> *const EVP_MD {
+pub unsafe fn rust_EVP_HPKE_KDF_hkdf_md(kdf: *const EVP_HPKE_KDF) -> *const EVP_MD {
     unsafe {
         let __out = EVP_HPKE_KDF_hkdf_md(kdf);
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_aes_128_gcm() -> *const EVP_HPKE_AEAD {
+pub unsafe fn rust_EVP_hpke_aes_128_gcm() -> *const EVP_HPKE_AEAD {
     unsafe {
         let __out = EVP_hpke_aes_128_gcm();
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_aes_256_gcm() -> *const EVP_HPKE_AEAD {
+pub unsafe fn rust_EVP_hpke_aes_256_gcm() -> *const EVP_HPKE_AEAD {
     unsafe {
         let __out = EVP_hpke_aes_256_gcm();
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_chacha20_poly1305() -> *const EVP_HPKE_AEAD {
+pub unsafe fn rust_EVP_hpke_chacha20_poly1305() -> *const EVP_HPKE_AEAD {
     unsafe {
         let __out = EVP_hpke_chacha20_poly1305();
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_aead_id(aead: *const EVP_HPKE_AEAD) -> u16 {
+pub unsafe fn rust_EVP_HPKE_AEAD_id(aead: *const EVP_HPKE_AEAD) -> u16 {
     unsafe {
         let __out = EVP_HPKE_AEAD_id(aead);
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_aead_aead(aead: *const EVP_HPKE_AEAD) -> *const EVP_AEAD {
+pub unsafe fn rust_EVP_HPKE_AEAD_aead(aead: *const EVP_HPKE_AEAD) -> *const EVP_AEAD {
     unsafe {
         let __out = EVP_HPKE_AEAD_aead(aead);
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_key_zero(key: *mut EVP_HPKE_KEY) {
+pub unsafe fn rust_EVP_HPKE_KEY_zero(key: *mut EVP_HPKE_KEY) {
     unsafe {
         let __out = EVP_HPKE_KEY_zero(key);
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_key_cleanup(key: *mut EVP_HPKE_KEY) {
+pub unsafe fn rust_EVP_HPKE_KEY_cleanup(key: *mut EVP_HPKE_KEY) {
     unsafe {
         let __out = EVP_HPKE_KEY_cleanup(key);
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_key_new() -> *mut EVP_HPKE_KEY {
+pub unsafe fn rust_EVP_HPKE_KEY_new() -> *mut EVP_HPKE_KEY {
     unsafe {
         let __out = EVP_HPKE_KEY_new();
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_key_free(key: *mut EVP_HPKE_KEY) {
+pub unsafe fn rust_EVP_HPKE_KEY_free(key: *mut EVP_HPKE_KEY) {
     unsafe {
         let __out = EVP_HPKE_KEY_free(key);
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_key_copy(
+pub unsafe fn rust_EVP_HPKE_KEY_copy(
     dst: *mut EVP_HPKE_KEY,
     src: *const EVP_HPKE_KEY,
 ) -> ::std::os::raw::c_int {
@@ -416,13 +416,13 @@ pub unsafe fn rust_evp_hpke_key_copy(
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_key_move(out: *mut EVP_HPKE_KEY, in_: *mut EVP_HPKE_KEY) {
+pub unsafe fn rust_EVP_HPKE_KEY_move(out: *mut EVP_HPKE_KEY, in_: *mut EVP_HPKE_KEY) {
     unsafe {
         let __out = EVP_HPKE_KEY_move(out, in_);
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_key_init(
+pub unsafe fn rust_EVP_HPKE_KEY_init(
     key: *mut EVP_HPKE_KEY,
     kem: *const EVP_HPKE_KEM,
     priv_key: &impl crate::FfiSlice,
@@ -432,7 +432,7 @@ pub unsafe fn rust_evp_hpke_key_init(
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_key_generate(
+pub unsafe fn rust_EVP_HPKE_KEY_generate(
     key: *mut EVP_HPKE_KEY,
     kem: *const EVP_HPKE_KEM,
 ) -> ::std::os::raw::c_int {
@@ -441,13 +441,13 @@ pub unsafe fn rust_evp_hpke_key_generate(
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_key_kem(key: *const EVP_HPKE_KEY) -> *const EVP_HPKE_KEM {
+pub unsafe fn rust_EVP_HPKE_KEY_kem(key: *const EVP_HPKE_KEY) -> *const EVP_HPKE_KEM {
     unsafe {
         let __out = EVP_HPKE_KEY_kem(key);
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_key_public_key(
+pub unsafe fn rust_EVP_HPKE_KEY_public_key(
     key: *const EVP_HPKE_KEY,
     out: &mut impl crate::FfiSliceMut,
 ) -> ::std::os::raw::c_int {
@@ -463,7 +463,7 @@ pub unsafe fn rust_evp_hpke_key_public_key(
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_key_private_key(
+pub unsafe fn rust_EVP_HPKE_KEY_private_key(
     key: *const EVP_HPKE_KEY,
     out: &mut impl crate::FfiSliceMut,
 ) -> ::std::os::raw::c_int {
@@ -479,31 +479,31 @@ pub unsafe fn rust_evp_hpke_key_private_key(
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_ctx_zero(ctx: *mut EVP_HPKE_CTX) {
+pub unsafe fn rust_EVP_HPKE_CTX_zero(ctx: *mut EVP_HPKE_CTX) {
     unsafe {
         let __out = EVP_HPKE_CTX_zero(ctx);
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_ctx_cleanup(ctx: *mut EVP_HPKE_CTX) {
+pub unsafe fn rust_EVP_HPKE_CTX_cleanup(ctx: *mut EVP_HPKE_CTX) {
     unsafe {
         let __out = EVP_HPKE_CTX_cleanup(ctx);
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_ctx_new() -> *mut EVP_HPKE_CTX {
+pub unsafe fn rust_EVP_HPKE_CTX_new() -> *mut EVP_HPKE_CTX {
     unsafe {
         let __out = EVP_HPKE_CTX_new();
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_ctx_free(ctx: *mut EVP_HPKE_CTX) {
+pub unsafe fn rust_EVP_HPKE_CTX_free(ctx: *mut EVP_HPKE_CTX) {
     unsafe {
         let __out = EVP_HPKE_CTX_free(ctx);
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_ctx_setup_sender(
+pub unsafe fn rust_EVP_HPKE_CTX_setup_sender(
     ctx: *mut EVP_HPKE_CTX,
     out_enc: &mut impl crate::FfiSliceMut,
     kem: *const EVP_HPKE_KEM,
@@ -531,7 +531,7 @@ pub unsafe fn rust_evp_hpke_ctx_setup_sender(
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_ctx_setup_sender_with_seed_for_testing(
+pub unsafe fn rust_EVP_HPKE_CTX_setup_sender_with_seed_for_testing(
     ctx: *mut EVP_HPKE_CTX,
     out_enc: &mut impl crate::FfiSliceMut,
     kem: *const EVP_HPKE_KEM,
@@ -562,7 +562,7 @@ pub unsafe fn rust_evp_hpke_ctx_setup_sender_with_seed_for_testing(
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_ctx_setup_recipient(
+pub unsafe fn rust_EVP_HPKE_CTX_setup_recipient(
     ctx: *mut EVP_HPKE_CTX,
     key: *const EVP_HPKE_KEY,
     kdf: *const EVP_HPKE_KDF,
@@ -584,7 +584,7 @@ pub unsafe fn rust_evp_hpke_ctx_setup_recipient(
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_ctx_setup_auth_sender(
+pub unsafe fn rust_EVP_HPKE_CTX_setup_auth_sender(
     ctx: *mut EVP_HPKE_CTX,
     out_enc: &mut impl crate::FfiSliceMut,
     key: *const EVP_HPKE_KEY,
@@ -612,7 +612,7 @@ pub unsafe fn rust_evp_hpke_ctx_setup_auth_sender(
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_ctx_setup_auth_sender_with_seed_for_testing(
+pub unsafe fn rust_EVP_HPKE_CTX_setup_auth_sender_with_seed_for_testing(
     ctx: *mut EVP_HPKE_CTX,
     out_enc: &mut impl crate::FfiSliceMut,
     key: *const EVP_HPKE_KEY,
@@ -643,7 +643,7 @@ pub unsafe fn rust_evp_hpke_ctx_setup_auth_sender_with_seed_for_testing(
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_ctx_setup_auth_recipient(
+pub unsafe fn rust_EVP_HPKE_CTX_setup_auth_recipient(
     ctx: *mut EVP_HPKE_CTX,
     key: *const EVP_HPKE_KEY,
     kdf: *const EVP_HPKE_KDF,
@@ -668,7 +668,7 @@ pub unsafe fn rust_evp_hpke_ctx_setup_auth_recipient(
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_ctx_open(
+pub unsafe fn rust_EVP_HPKE_CTX_open(
     ctx: *mut EVP_HPKE_CTX,
     out: &mut impl crate::FfiSliceMut,
     in_: &impl crate::FfiSlice,
@@ -690,7 +690,7 @@ pub unsafe fn rust_evp_hpke_ctx_open(
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_ctx_seal(
+pub unsafe fn rust_EVP_HPKE_CTX_seal(
     ctx: *mut EVP_HPKE_CTX,
     out: &mut impl crate::FfiSliceMut,
     in_: &impl crate::FfiSlice,
@@ -712,7 +712,7 @@ pub unsafe fn rust_evp_hpke_ctx_seal(
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_ctx_export(
+pub unsafe fn rust_EVP_HPKE_CTX_export(
     ctx: *const EVP_HPKE_CTX,
     out: *mut u8,
     secret_len: usize,
@@ -729,25 +729,25 @@ pub unsafe fn rust_evp_hpke_ctx_export(
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_ctx_max_overhead(ctx: *const EVP_HPKE_CTX) -> usize {
+pub unsafe fn rust_EVP_HPKE_CTX_max_overhead(ctx: *const EVP_HPKE_CTX) -> usize {
     unsafe {
         let __out = EVP_HPKE_CTX_max_overhead(ctx);
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_ctx_kem(ctx: *const EVP_HPKE_CTX) -> *const EVP_HPKE_KEM {
+pub unsafe fn rust_EVP_HPKE_CTX_kem(ctx: *const EVP_HPKE_CTX) -> *const EVP_HPKE_KEM {
     unsafe {
         let __out = EVP_HPKE_CTX_kem(ctx);
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_ctx_aead(ctx: *const EVP_HPKE_CTX) -> *const EVP_HPKE_AEAD {
+pub unsafe fn rust_EVP_HPKE_CTX_aead(ctx: *const EVP_HPKE_CTX) -> *const EVP_HPKE_AEAD {
     unsafe {
         let __out = EVP_HPKE_CTX_aead(ctx);
         __out
     }
 }
-pub unsafe fn rust_evp_hpke_ctx_kdf(ctx: *const EVP_HPKE_CTX) -> *const EVP_HPKE_KDF {
+pub unsafe fn rust_EVP_HPKE_CTX_kdf(ctx: *const EVP_HPKE_CTX) -> *const EVP_HPKE_KDF {
     unsafe {
         let __out = EVP_HPKE_CTX_kdf(ctx);
         __out
